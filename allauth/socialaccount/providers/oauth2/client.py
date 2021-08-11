@@ -59,6 +59,7 @@ class OAuth2Client(object):
                 {
                     "client_id": self.consumer_key,
                     "client_secret": self.consumer_secret,
+                    "code_verifier": self.consumer_secret,
                 }
             )
         params = None
