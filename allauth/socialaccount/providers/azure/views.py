@@ -1,4 +1,5 @@
 from __future__ import unicode_literals
+from allauth.socialaccount import app_settings
 
 import requests
 
@@ -11,10 +12,6 @@ from allauth.socialaccount.providers.oauth2.views import (
 from .provider import AzureProvider
 
 
-LOGIN_URL = "https://login.microsoftonline.com/common/oauth2/v2.0"
-GRAPH_URL = "https://graph.microsoft.com/v1.0"
-
-
 class AzureOAuth2Adapter(OAuth2Adapter):
     """
     Docs available at:
@@ -22,14 +19,21 @@ class AzureOAuth2Adapter(OAuth2Adapter):
     """
 
     provider_id = AzureProvider.id
-    access_token_url = LOGIN_URL + "/token"
-    authorize_url = LOGIN_URL + "/authorize"
-    profile_url = "https://graph.microsoft.com/v1.0/me"
+    settings = app_settings.PROVIDERS.get(provider_id, {})
+    provider_default_auth_url = "https://login.microsoftonline.com/{}/oauth2/v2.0".format(
+        settings.get("TENANT", 'common')
+    )
+    provider_default_graph_url = "https://graph.microsoft.com/v1.0"
+
+    access_token_url = provider_default_auth_url + "/token"
+    authorize_url = provider_default_auth_url + "/authorize"
+    profile_url = provider_default_auth_url + "/me"
+    
     # Can be used later to obtain group data. Needs 'Group.Read.All' or
     # similar.
     #
     # See https://developer.microsoft.com/en-us/graph/docs/api-reference/beta/api/user_list_memberof  # noqa
-    groups_url = GRAPH_URL + "/me/memberOf?$select=displayName"
+    groups_url = provider_default_graph_url + "/me/memberOf?$select=displayName"
 
     def complete_login(self, request, app, token, **kwargs):
         headers = {"Authorization": "Bearer {0}".format(token.token)}
