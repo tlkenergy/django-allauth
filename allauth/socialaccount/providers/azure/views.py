@@ -27,8 +27,8 @@ class AzureOAuth2Adapter(OAuth2Adapter):
 
     access_token_url = provider_default_auth_url + "/token"
     authorize_url = provider_default_auth_url + "/authorize"
-    profile_url = provider_default_auth_url + "/me"
-    
+    profile_url = provider_default_graph_url + "/me"
+
     # Can be used later to obtain group data. Needs 'Group.Read.All' or
     # similar.
     #
